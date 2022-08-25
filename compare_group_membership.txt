@@ -1,0 +1,61 @@
+Write-Host "Compares 2 AD user accounts for group membership" -ForegroundColor Green
+# Text notifying what this script does 
+$Identity1 = (Read-Host -Prompt "Please enter AD User 1")
+# Text asking for AD User 1 to declare variable
+$Identity2 = (Read-Host -Prompt "Please enter AD User 2")
+# Text asking for AD User 2 to declare variable
+
+    $user1 = (Get-ADPrincipalGroupMembership -Identity $Identity1 | select Name | Sort-Object -Property Name).Name
+    Write-Verbose ($user1 -join "; ")
+
+# $Identity1 specified earlier will specify the identity and select the specific property. Declares $user1 variable
+
+    $user2 = (Get-ADPrincipalGroupMembership -Identity $Identity2 | select Name | Sort-Object -Property Name).Name
+    Write-Verbose ""
+    Write-Verbose ($user2 -join "; ")
+
+# $Identity1 specified earlier will specify the identity and select the specific property. Declares $user2 variable
+
+    $SameGroups = (Compare-Object $user1 $user2 -PassThru -IncludeEqual -ExcludeDifferent)
+
+# Compare the objects and see what is different between the $user1 and $user2 declared earlier.
+
+    Write-Verbose ""
+    Write-Verbose ($SameGroups -join "; ")
+
+# Compares identical groups
+
+    $UniqueID1 = (Compare-Object $user1 $user2 -PassThru | where {$_.SideIndicator -eq "<="})
+    Write-Verbose ""
+
+# Passthrough <=
+
+    Write-Verbose ($UniqueID1 -join "; ")
+    $UniqueID2 = (Compare-Object $user1 $user2 -PassThru | where {$_.SideIndicator -eq "=>"})
+
+# Passthrough =>
+
+    Write-Verbose ""
+    Write-Verbose ($UniqueID2 -join "; ")
+    $ID1Name = (Get-ADUser -Identity $Identity1 | Select Name).Name
+    Write-Verbose ""
+    Write-Verbose ($ID1Name -join "; ")
+    $ID2Name = (Get-ADUser -Identity $Identity2 | Select Name).Name
+    Write-Verbose ""
+    Write-Verbose ($ID2Name -join "; ")
+
+    Write-Host "--------------------------------------------------------------------------"
+    Write-Host "[$ID1Name] and [$ID2Name] have the following groups in common:"
+    Write-Host "--------------------------------------------------------------------------"
+    $SameGroups
+    Write-Host ""
+
+    Write-Host "--------------------------------------------------------------------------"
+    Write-Host "The following groups are unique to [$ID1Name]:"
+    Write-Host "--------------------------------------------------------------------------"
+    $UniqueID1
+    Write-Host ""
+    Write-Host "--------------------------------------------------------------------------"
+    Write-Host "The following groups are unique to [$ID2Name]:"
+    Write-Host "--------------------------------------------------------------------------"
+    $UniqueID2
