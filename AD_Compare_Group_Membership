@@ -1,4 +1,5 @@
-function AD-GroupCompare {
+function Get-ADGroupCompare
+{
 
 Write-Host "Compares 2 AD user accounts for group membership" -ForegroundColor Magenta
 # Text notifying what this script does 
