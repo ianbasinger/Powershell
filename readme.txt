@@ -1,4 +1,4 @@
-All of powershell scripts I'm working on that I find useful.
+All of powershell scripts I'm working on that I find useful. Created into a profile to give yourself essentially more useful homemade cmdlets that can save you time searching stuff up, or give you useful information.
 
 Vast majority of them are for AD useage such as resetting a password, bulk resetting a password list, and other stuff.
 
