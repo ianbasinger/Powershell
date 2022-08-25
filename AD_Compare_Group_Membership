@@ -1,3 +1,5 @@
+function AD-GroupCompare {
+
 Write-Host "Compares 2 AD user accounts for group membership" -ForegroundColor Magenta
 # Text notifying what this script does 
 $Identity1 = $input = $(Write-Host "Please enter AD User 1" -NoNewLine) + $(Write-Host " EX: John.Smith " -ForegroundColor Green -NoNewLine; Read-Host) 
@@ -59,3 +61,4 @@ $Identity2 = $input = $(Write-Host "Please enter AD User 2" -NoNewLine) + $(Writ
     Write-Host "The following groups are unique to [$ID2Name]:"
     Write-Host "--------------------------------------------------------------------------" -ForegroundColor Red
     $UniqueID2
+}
