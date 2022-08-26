@@ -1,11 +1,21 @@
 function Get-ADLockoutCheck
+
 {
-$samAccountName = Read-Host -Prompt "Enter AD Account Name Here"
-# Input username to specify the variable.
+
+$samAccountName = Read-Host -Prompt "Enter AD Account Name Here
+
+# Input username to specify the variable
+
 Get-ADUser $samAccountName -Properties AccountLockoutTime,LastBadPasswordAttempt,BadPwdCount,LockedOut
-# Checks last bad password attempts and locked out as well.
+
+# Checks last bad password attempts and locked out and duration of lockout as well
+
 Get-ADUser -Identity $samAccountName -Properties PasswordLastSet | ft Name, PasswordLastSet
-# Check when password was last set, gives date and time.
+
+# Check when password was last set, gives date and time
+
 Get-ADUser -Identity $samAccountName -Properties LastLogon | Select Name, @{Name='LastLogon';Expression={[DateTime]::FromFileTime($_.LastLogon)}}
-# Checks to see when they logged in last.
+
+# Checks to see when they logged in last
+
 }
