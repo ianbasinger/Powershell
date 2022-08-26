@@ -1,6 +1,6 @@
 	# This script is ran to gather information on a computer. Lots of information including TPM info, BIOS version, hardware stats, network stats, etc. 
 
-	function Get-ComputerInfo
+	function Get-ADComputerInfo
 	{
 
 	$ComputerName = Read-Host -Prompt "Enter computer tag number"
