@@ -1,4 +1,6 @@
 	# This script is ran to gather information on a computer. Lots of information including TPM info, BIOS version, hardware stats, network stats, etc. 
+	
+	# Reminder to myself to see about adding more info if possible, monitor/display settings and potentially audio device settings as well. 8/25
 
 	function Get-ADComputerInfo
 	{
