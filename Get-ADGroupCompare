@@ -2,10 +2,15 @@ function Get-ADGroupCompare
 {
 
 Write-Host "Compares 2 AD user accounts for group membership" -ForegroundColor Magenta
+
 # Text notifying what this script does 
-$Identity1 = $input = $(Write-Host "Please enter AD User 1" -NoNewLine) + $(Write-Host " EX: John.Smith " -ForegroundColor Green -NoNewLine; Read-Host) 
+
+$Identity1 = $input = $(Write-Host "Please enter AD User 1" -NoNewLine) + $(Write-Host " EX: John.Smith " -ForegroundColor Green -NoNewLine; Read-Host)
+
 # Text asking for AD User 1 to declare variable
+
 $Identity2 = $input = $(Write-Host "Please enter AD User 2" -NoNewLine) + $(Write-Host " EX: Jacob.Ryan " -ForegroundColor Red -NoNewLine; Read-Host)
+
 # Text asking for AD User 2 to declare variable
 
     $user1 = (Get-ADPrincipalGroupMembership -Identity $Identity1 | select Name | Sort-Object -Property Name).Name
