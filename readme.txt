@@ -1,4 +1,4 @@
-All of powershell scripts I'm working on that I find useful. A lot of them follow a similar naming convention. Main idea is to put them in your PS profile so you can use them like you would with any PS cmdlet. Mostly QOL scripts that save you time or help you get things done quicker for daily tasks
+All of powershell functions I'm working on that I find useful. A lot of them follow a similar naming convention. Main idea is to put them in your PS profile so you can use them like you would with any PS cmdlet. Mostly QOL functions that save you time or help you get things done quicker for daily tasks
 
 Vast majority of them are for AD useage such as resetting a password, bulk resetting a password list, and other stuff. Also network troubleshooting for WAN or LAN issues, WLAN as well.
 
