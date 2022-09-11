@@ -1,10 +1,8 @@
-# Script is a "choose your own adventure" switch condition setup for troubleshooting. Basic stuff that you can do with some number commands to conduct some troubleshooting
+# Function is a "choose your own adventure" switch condition setup for troubleshooting. Basic stuff that you can do with some number commands to conduct some troubleshooting
 
 function Get-NetworkTroubleshoot
 {
-
 ipconfig /all
-
 # Quick ipconfig to show us some basic starting info before proceeding, check for APIPA or any other issues here for example, check DNS and DHCP etc and more
 
 $hostname = Read-Host "Enter source IP address"
