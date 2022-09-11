@@ -1,3 +1,5 @@
+# Script is a "choose your own adventure" switch condition setup for troubleshooting. Basic stuff that you can do with some number commands to conduct some troubleshooting
+
 function Get-NetworkTroubleshoot
 {
 
