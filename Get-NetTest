@@ -1,3 +1,5 @@
+# This script will conduct some common network troubleshooting, and is meant to be ran locally on the computer. It goes in order from the OSI layer starting at the Physical Layer.
+
 function Get-NetworkTest
 
 {
