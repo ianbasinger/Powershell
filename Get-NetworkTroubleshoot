@@ -10,11 +10,11 @@ $hostname = Read-Host "Enter source IP address"
 do  {
     $Title = 'Network Troubleshooting'
     Write-Host "================$title================" -ForegroundColor Green
-    Write-Host "1: Press '1' to ping loopback addressr" -ForegroundColor Green
+    Write-Host "1: Press '1' to Ping loopback address on local computer" -ForegroundColor Green
     Write-Host "2: Press '2' to Ping a destination IP" -ForegroundColor Green
     Write-Host "3: Press '3' for a Tracert on a destination IP" -ForegroundColor Green
-    Write-Host "4: Press '4' to conduct a Ping from local computer to 3 DNS servers to check DNS resolution" -ForegroundColor Green
-    Write-Host "5: Press '5' to Ping 3 external destination IP addresses to check connectivity" -ForegroundColor Green
+    Write-Host "4: Press '4' for a Ping from local computer to 3 DNS servers to check DNS resolution" -ForegroundColor Green
+    Write-Host "5: Press '5' for a Ping from local computer to Ping 3 external destination IP addresses to check connectivity" -ForegroundColor Green
     Write-Host "6: Press '6' for WLAN report of local computer" -ForegroundColor Green
     Write-Host "7: Press '7' for Network Adapters of local computer" -ForegroundColor Green
     Write-Host "8: Press '8' for List of reachable neighbors on network" -ForegroundColor Green
@@ -59,25 +59,25 @@ do  {
             # Elseif to ICMP ping external DNS names to see if DNS resolution is working
                 if (Test-Connection -Quiet google.com)
                         {
-                        Write-Host "DNS Resolution for Google.com was successfull, stopping test"
+                        Write-Host "DNS Resolution for Google.com was successfull, stopping test" -ForegroundColor Green
                         }
                         else
                         {
-                        Write-Host "DNS Resolution for Google.com was unsuccessfull, trying another.."
+                        Write-Host "DNS Resolution for Google.com was unsuccessfull, trying another.." -ForegroundColor Red
                 if (Test-Connection -Quiet quad9.com)
                         {
-                        Write-Host "DNS Resolution for Quad9.com was successfull, stopping test"
+                        Write-Host "DNS Resolution for Quad9.com was successfull, stopping test" -ForegroundColor Green
                         }
                         else
                         {
-                        Write-Host "DNS Resolution for Quad9.com was unsuccessfull, trying another.."
+                        Write-Host "DNS Resolution for Quad9.com was unsuccessfull, trying another.." -ForegroundColor Red
                 if (Test-Connection -Quiet one.one.one.one)
                         {
-                        Write-Host "DNS Resolution for Cloudflare.com was successfull, stopping test"
+                        Write-Host "DNS Resolution for Cloudflare.com was successfull, stopping test" -ForegroundColor Green
                         }
                         else
                         {
-                        Write-Host "DNS Resolution for Cloudflare.com was unsuccessfull, that is 3 providers with this issue. DNS is most likely not working on this device"
+                        Write-Host "DNS Resolution for Cloudflare.com was unsuccessfull, that is 3 providers with this issue. DNS is most likely not working on this device" -ForegroundColor Red
                                     }
                                 }
                             }
@@ -88,25 +88,25 @@ do  {
             # Elseif to ICMP ping external destination IP addresses to check for network connectivity
                 if (Test-Connection -Quiet 1.1.1.1)
                         {
-                        Write-Host "Ping for 1.1.1.1 was successfull, stopping test"
+                        Write-Host "Ping for 1.1.1.1 was successfull, stopping test" -ForegroundColor Green
                         }
                         else
                         {
-                        Write-Host "Ping for 1.1.1.1 was unsuccessfull, trying another.."
+                        Write-Host "Ping for 1.1.1.1 was unsuccessfull, trying another.." -ForegroundColor Red
                 if (Test-Connection -Quiet 8.8.8.8)
                         {
-                        Write-Host "Ping for 8.8.8.8 was successfull, stopping test"
+                        Write-Host "Ping for 8.8.8.8 was successfull, stopping test" -ForegroundColor Green
                         }
                         else
                         {
-                        Write-Host "Ping for 8.8.8.8 was unsuccessfull, trying another.."
+                        Write-Host "Ping for 8.8.8.8 was unsuccessfull, trying another.." -ForegroundColor Red
                 if (Test-Connection -Quiet 9.9.9.9)
                         {
-                        Write-Host "Ping for 9.9.9.9 was successfull, stopping test"
+                        Write-Host "Ping for 9.9.9.9 was successfull, stopping test" -ForegroundColor Green
                         }
                         else
                         {
-                        Write-Host "Ping for 3 seperate destination IPs was unsuccessfull, most likely issue with device"
+                        Write-Host "Ping for 3 seperate destination IPs was unsuccessfull, most likely issue with device" -ForegroundColor Red
                                     }
                                 }
                             }
