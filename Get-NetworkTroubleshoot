@@ -9,18 +9,18 @@ $hostname = Read-Host "Enter source IP address"
 
 do  {
     $Title = 'Network Troubleshooting'
-    Write-Host "================$title================" -ForegroundColor Green
-    Write-Host "1: Press '1' to Ping loopback address on local computer" -ForegroundColor Green
-    Write-Host "2: Press '2' to Ping a destination IP" -ForegroundColor Green
-    Write-Host "3: Press '3' for a Tracert on a destination IP" -ForegroundColor Green
-    Write-Host "4: Press '4' for a Ping from local computer to 3 DNS servers to check DNS resolution" -ForegroundColor Green
-    Write-Host "5: Press '5' for a Ping from local computer to Ping 3 external destination IP addresses to check connectivity" -ForegroundColor Green
-    Write-Host "6: Press '6' for WLAN report of local computer" -ForegroundColor Green
-    Write-Host "7: Press '7' for Network Adapters of local computer" -ForegroundColor Green
-    Write-Host "8: Press '8' for List of reachable neighbors on network" -ForegroundColor Green
-    Write-Host "9: Press '9' to get IPv4 address of local computer" -ForegroundColor Green
-    Write-Host "10: Press '10' to get a full ipconfig report" -ForegroundColor Green
-    Write-Host "11: Press '11' to get IP addresses that were leased by DHCP" -ForegroundColor Green
+    Write-Host "================$title================" -ForegroundColor Cyan
+    Write-Host "1: Press '1' to Ping loopback address on local computer" -ForegroundColor Yellow
+    Write-Host "2: Press '2' to Ping a destination IP" -ForegroundColor Yellow
+    Write-Host "3: Press '3' for a Tracert on a destination IP" -ForegroundColor Yellow
+    Write-Host "4: Press '4' for a Ping from local computer to 3 DNS servers to check DNS resolution" -ForegroundColor Yellow
+    Write-Host "5: Press '5' for a Ping from local computer to Ping 3 external destination IP addresses to check connectivity" -ForegroundColor Yellow
+    Write-Host "6: Press '6' for WLAN report of local computer" -ForegroundColor Yellow
+    Write-Host "7: Press '7' for Network Adapters of local computer" -ForegroundColor Yellow
+    Write-Host "8: Press '8' for List of reachable neighbors on network" -ForegroundColor Yellow
+    Write-Host "9: Press '9' to get IPv4 address of local computer" -ForegroundColor Yellow
+    Write-Host "10: Press '10' to get a full ipconfig report" -ForegroundColor Yellow
+    Write-Host "11: Press '11' to get IP addresses that were leased by DHCP" -ForegroundColor Yellow
     Write-Host "Q: Press 'Q' to quit." -ForegroundColor Red
 
     $selection = Read-Host "Please make a selection"
