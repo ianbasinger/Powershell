@@ -1,3 +1,5 @@
+# This compares 2 AD usernames and will tell you what AD groups they both have in common, and which ones they have that are different
+
 function Get-ADGroupCompare
 {
 
