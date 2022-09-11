@@ -8,4 +8,4 @@ if (!(Test-Path -Path $PROFILE)) {
   New-Item -ItemType File -Path $PROFILE -Force
 }
 
-Create new .ps1 profile where you can offload all the functions into one profile for ease of use and store the new functions into memory.
+That will create a new .ps1 profile where you can store all the functions into memory so you can call on them anytime while using PS.
