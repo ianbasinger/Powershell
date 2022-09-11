@@ -1,7 +1,6 @@
-# This script will conduct some common network troubleshooting, and is meant to be ran locally on the computer. It goes in order from the OSI layer starting at the Physical Layer.
+# This function will conduct some common network troubleshooting, and is meant to be ran locally on the computer. It goes in order from the OSI layer starting at the Physical Layer.
 
 function Get-NetworkTest
-
 {
         Write-Host "This will conduct network troubleshooting in order from : Loopback test, Gateway test, External IP Ping test, DNS resolving test, and will stop at whichever step it failed" -ForegroundColor Yellow
 
