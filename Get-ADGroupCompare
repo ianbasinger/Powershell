@@ -1,54 +1,53 @@
-# This compares 2 AD usernames and will tell you what AD groups they both have in common, and which ones they have that are different
+# Function compares 2 AD usernames and will tell you what AD groups they both have in common, and which ones they have that are different
 
 function Get-ADGroupCompare
 {
-
 Write-Host "Compares 2 AD user accounts for group membership" -ForegroundColor Magenta
 
 $Identity1 = $input = $(Write-Host "Please enter AD User 1" -NoNewLine) + $(Write-Host " EX: John.Smith " -ForegroundColor Green -NoNewLine; Read-Host)
 
 $Identity2 = $input = $(Write-Host "Please enter AD User 2" -NoNewLine) + $(Write-Host " EX: Jacob.Ryan " -ForegroundColor Red -NoNewLine; Read-Host)
 
-    $user1 = (Get-ADPrincipalGroupMembership -Identity $Identity1 | select Name | Sort-Object -Property Name).Name
-    Write-Verbose ($user1 -join "; ")
+$user1 = (Get-ADPrincipalGroupMembership -Identity $Identity1 | select Name | Sort-Object -Property Name).Name
+Write-Verbose ($user1 -join "; ")
 
-    $user2 = (Get-ADPrincipalGroupMembership -Identity $Identity2 | select Name | Sort-Object -Property Name).Name
-    Write-Verbose ""
-    Write-Verbose ($user2 -join "; ")
+$user2 = (Get-ADPrincipalGroupMembership -Identity $Identity2 | select Name | Sort-Object -Property Name).Name
+Write-Verbose ""
+Write-Verbose ($user2 -join "; ")
 
-    $SameGroups = (Compare-Object $user1 $user2 -PassThru -IncludeEqual -ExcludeDifferent)
+$SameGroups = (Compare-Object $user1 $user2 -PassThru -IncludeEqual -ExcludeDifferent)
 
-    Write-Verbose ""
-    Write-Verbose ($SameGroups -join "; ")
+Write-Verbose ""
+Write-Verbose ($SameGroups -join "; ")
 
-    $UniqueID1 = (Compare-Object $user1 $user2 -PassThru | where {$_.SideIndicator -eq "<="})
-    Write-Verbose ""
+$UniqueID1 = (Compare-Object $user1 $user2 -PassThru | where {$_.SideIndicator -eq "<="})
+Write-Verbose ""
 
-    Write-Verbose ($UniqueID1 -join "; ")
-    $UniqueID2 = (Compare-Object $user1 $user2 -PassThru | where {$_.SideIndicator -eq "=>"})
+Write-Verbose ($UniqueID1 -join "; ")
+$UniqueID2 = (Compare-Object $user1 $user2 -PassThru | where {$_.SideIndicator -eq "=>"})
 
-    Write-Verbose ""
-    Write-Verbose ($UniqueID2 -join "; ")
-    $ID1Name = (Get-ADUser -Identity $Identity1 | Select Name).Name
-    Write-Verbose ""
-    Write-Verbose ($ID1Name -join "; ")
-    $ID2Name = (Get-ADUser -Identity $Identity2 | Select Name).Name
-    Write-Verbose ""
-    Write-Verbose ($ID2Name -join "; ")
+Write-Verbose ""
+Write-Verbose ($UniqueID2 -join "; ")
+$ID1Name = (Get-ADUser -Identity $Identity1 | Select Name).Name
+Write-Verbose ""
+Write-Verbose ($ID1Name -join "; ")
+$ID2Name = (Get-ADUser -Identity $Identity2 | Select Name).Name
+Write-Verbose ""
+Write-Verbose ($ID2Name -join "; ")
 
-    Write-Host "--------------------------------------------------------------------------" -ForegroundColor Magenta
-    Write-Host "[$ID1Name] and [$ID2Name] have the following groups in common:"
-    Write-Host "--------------------------------------------------------------------------" -ForegroundColor Magenta
-    $SameGroups
-    Write-Host ""
+Write-Host "--------------------------------------------------------------------------" -ForegroundColor Magenta
+Write-Host "[$ID1Name] and [$ID2Name] have the following groups in common:"
+Write-Host "--------------------------------------------------------------------------" -ForegroundColor Magenta
+$SameGroups
+Write-Host ""
 
-    Write-Host "--------------------------------------------------------------------------" -ForegroundColor Green
-    Write-Host "The following groups are unique to [$ID1Name]:"
-    Write-Host "--------------------------------------------------------------------------" -ForegroundColor Green
-    $UniqueID1
-    Write-Host ""
-    Write-Host "--------------------------------------------------------------------------" -ForegroundColor Red
-    Write-Host "The following groups are unique to [$ID2Name]:"
-    Write-Host "--------------------------------------------------------------------------" -ForegroundColor Red
-    $UniqueID2
+Write-Host "--------------------------------------------------------------------------" -ForegroundColor Green
+Write-Host "The following groups are unique to [$ID1Name]:"
+Write-Host "--------------------------------------------------------------------------" -ForegroundColor Green
+$UniqueID1
+Write-Host ""
+Write-Host "--------------------------------------------------------------------------" -ForegroundColor Red
+Write-Host "The following groups are unique to [$ID2Name]:"
+Write-Host "--------------------------------------------------------------------------" -ForegroundColor Red
+$UniqueID2
 }
