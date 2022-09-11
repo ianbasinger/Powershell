@@ -1,0 +1,148 @@
+function Get-NetworkTroubleshoot
+{
+
+ipconfig /all
+
+# Quick ipconfig to show us some basic starting info before proceeding, check for APIPA or any other issues here for example, check DNS and DHCP etc and more
+
+$hostname = Read-Host "Enter source IP address"
+
+do  {
+    $Title = 'Network Troubleshooting'
+    Write-Host "================$title================" -ForegroundColor Green
+    Write-Host "1: Press '1' to ping loopback addressr" -ForegroundColor Green
+    Write-Host "2: Press '2' to Ping a destination IP" -ForegroundColor Green
+    Write-Host "3: Press '3' for a Tracert on a destination IP" -ForegroundColor Green
+    Write-Host "4: Press '4' to conduct a Ping from local computer to 3 DNS servers to check DNS resolution" -ForegroundColor Green
+    Write-Host "5: Press '5' to Ping 3 external destination IP addresses to check connectivity" -ForegroundColor Green
+    Write-Host "6: Press '6' for WLAN report of local computer" -ForegroundColor Green
+    Write-Host "7: Press '7' for Network Adapters of local computer" -ForegroundColor Green
+    Write-Host "8: Press '8' for List of reachable neighbors on network" -ForegroundColor Green
+    Write-Host "9: Press '9' to get IPv4 address of local computer" -ForegroundColor Green
+    Write-Host "10: Press '10' to get a full ipconfig report" -ForegroundColor Green
+    Write-Host "11: Press '11' to get IP addresses that were leased by DHCP" -ForegroundColor Green
+    Write-Host "Q: Press 'Q' to quit." -ForegroundColor Red
+
+    $selection = Read-Host "Please make a selection"
+
+    switch ($selection)
+        {
+
+        '1' {
+            Test-Connection 127.0.0.1 | Write-Output
+            # ICMP Ping to check physical layer problems, checks loopback or localhost interface
+            
+            pause
+            }
+
+
+        '2' {
+            $hostname2 = Read-Host "Please enter the destination IP you want to ping"
+            Test-NetConnection $hostname2 -InformationLevel Detailed | Write-Output
+            # ICMP Ping to check a destination IP address, can use this to ping default gateway for example
+
+            pause
+            }
+        '3' {
+
+            $hostname3 = Read-Host "Please enter the destination IP you want to conduct a trace on"
+            Test-NetConnection $hostname3 -TraceRoute |
+                Select -ExpandProperty TraceRoute |
+                ForEach-Object {
+                    Resolve-DnsName $_ -type PTR -ErrorAction SilentlyContinue
+                    # Conducts tracert on a destination IP address or DNS name
+                    }
+                   }
+
+        '4' {
+            Write-Host "Attempting to resolve DNS names..."
+            # Elseif to ICMP ping external DNS names to see if DNS resolution is working
+                if (Test-Connection -Quiet google.com)
+                        {
+                        Write-Host "DNS Resolution for Google.com was successfull, stopping test"
+                        }
+                        else
+                        {
+                        Write-Host "DNS Resolution for Google.com was unsuccessfull, trying another.."
+                if (Test-Connection -Quiet quad9.com)
+                        {
+                        Write-Host "DNS Resolution for Quad9.com was successfull, stopping test"
+                        }
+                        else
+                        {
+                        Write-Host "DNS Resolution for Quad9.com was unsuccessfull, trying another.."
+                if (Test-Connection -Quiet one.one.one.one)
+                        {
+                        Write-Host "DNS Resolution for Cloudflare.com was successfull, stopping test"
+                        }
+                        else
+                        {
+                        Write-Host "DNS Resolution for Cloudflare.com was unsuccessfull, that is 3 providers with this issue. DNS is most likely not working on this device"
+                                    }
+                                }
+                            }
+            }
+
+        '5'{
+            Write-Host "Attempting to ping an external destination IP address.."
+            # Elseif to ICMP ping external destination IP addresses to check for network connectivity
+                if (Test-Connection -Quiet 1.1.1.1)
+                        {
+                        Write-Host "Ping for 1.1.1.1 was successfull, stopping test"
+                        }
+                        else
+                        {
+                        Write-Host "Ping for 1.1.1.1 was unsuccessfull, trying another.."
+                if (Test-Connection -Quiet 8.8.8.8)
+                        {
+                        Write-Host "Ping for 8.8.8.8 was successfull, stopping test"
+                        }
+                        else
+                        {
+                        Write-Host "Ping for 8.8.8.8 was unsuccessfull, trying another.."
+                if (Test-Connection -Quiet 9.9.9.9)
+                        {
+                        Write-Host "Ping for 9.9.9.9 was successfull, stopping test"
+                        }
+                        else
+                        {
+                        Write-Host "Ping for 3 seperate destination IPs was unsuccessfull, most likely issue with device"
+                                    }
+                                }
+                            }
+            }
+            
+
+        '6'{
+            netsh wlan show wlanreport
+            # Generates a WLAN report (Wireless only) and saves to C:\ProgramData\Microsoft\Windows\WlanReport -- saves .html file and open on browser of choice to view WLAN report
+                }  
+
+        '7' {
+            Get-NetAdapter
+            # Gets network adapters
+                }
+        '8' {
+            Get-NetNeighbor
+            # Gets nearest neighbors with ARP
+                }
+        '9' {
+            Get-NetIPConfiguration Select-Object -Property IPv4Address | Write-Output
+            # Grabs local IPv4 addresses
+                }
+        '10' {
+            Get-NetIPConfiguration | Write-Output
+            # Gets all IP addresses
+                }
+        '11' {
+            Get-NetIPAddress -PrefixOrigin Dhcp | Select PSComputerName, IPAddress | Write-Output
+            # Get all IP addresses that were leased via DHCP and filter 2 parameters
+            }
+            
+            pause {
+            }
+        } # end >>> switch ($selection)
+    } # end >>> do
+    until ($selection -eq 'q')
+
+    }
