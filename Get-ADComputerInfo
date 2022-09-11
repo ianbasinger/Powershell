@@ -4,7 +4,7 @@
 
 function Get-ADComputerInfo
 {
-$ComputerName = Read-Host -Prompt "Enter computer tag number"
+$ComputerName = Read-Host -Prompt "Enter computer name"
 Get-ADComputer $ComputerName
 Get-ComputerInfo $ComputerName
 Get-Tpm $ComputerName 
