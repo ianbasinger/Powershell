@@ -8,7 +8,7 @@ function Get-NetworkTest
         Write-Host "Conducting loopback test to 127.0.0.1..."
        
        if (Test-Connection -Quiet 127.0.0.1)
-       # ICMP Ping to check physical layer problems, checks loopback or localhost interface, writes to console wether true or not using -Quiet Boolean
+       # ICMP Ping to check physical layer problems, checks loopback or localhost interface, if this is down then most likely issue with NIC or drivers potentially
        {
        Write-Host "Loopback test to 127.0.0.1 successfull, loopback is working" -ForegroundColor Green
        }
@@ -20,9 +20,13 @@ function Get-NetworkTest
 $defaultgateway = Get-WmiObject -Class Win32_IP4RouteTable | 
 where { $_.destination -eq '0.0.0.0' -and $_.mask -eq '0.0.0.0'} | 
 Sort-Object metric1 | select nexthop, metric1, interfaceindex | Select-Object -First 1 | Select-Object -ExpandProperty nexthop
+# This pulls up Windows registry keys and looks for the IPv4 route table, pulls the table and selects the highest metric (so first priority default gateway)
+# After pulling default gateway and most likely candidate, filters down to first IP address and selects it, puts into variable to be used for ping
+
 Write-Host "Pinging default gateway..."
 
 if(Test-Connection -Quiet $defaultgateway)
+# ICMP ping to default gateway to see if we can even reach the gateway, if not then WAN connectivity isn't likely
 {
 Write-Host "Default gateway was reachable, no issue reaching default gateway" -ForegroundColor Green
 }
