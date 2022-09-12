@@ -1,7 +1,6 @@
 # Function to check if an AD user is locked out, bad password attempts, when last logged in to a domain computer, and when password was last set
 
 function Get-ADLockoutCheck
-
 {
 $samAccountName = Read-Host -Prompt "Enter AD Account Name Here"
 # Input username to specify the variable
@@ -14,5 +13,4 @@ Get-ADUser -Identity $samAccountName -Properties PasswordLastSet | ft Name, Pass
 
 Get-ADUser -Identity $samAccountName -Properties LastLogon | Select Name, @{Name='LastLogon';Expression={[DateTime]::FromFileTime($_.LastLogon)}}
 # Checks to see when they logged in last on a computer on the domain
-
 }
