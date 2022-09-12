@@ -93,7 +93,7 @@ function Get-NetworkTest
         {
             Write-Host "DNS Resolution for Cloudflare.com was unsuccessfull, that is 3 providers with this issue. DNS is most likely not working on this device" -ForegroundColor Red
 
-        #====================================================================End of DNS test====================================================================#
+    #====================================================================End of DNS test====================================================================#
             }
         }
     }
