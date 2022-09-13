@@ -2,7 +2,7 @@ All of powershell functions I'm working on that I find useful. A lot of them fol
 
 Current Projects :
 
-1. Get-NetTest - This will run a small script to test common tier 1 network troubleshooting. Checks loopback if functional, pulls IPv4 route table and gets default gateway with highest metric, pings it, checks DNS resolution and checks a few external IPs for reachability)
+1. Get-NetTest - This will run a small script to test common tier 1 network troubleshooting. Checks loopback if functional, pulls IPv4 route table and gets default gateway with highest metric, pings it, checks DNS resolution and checks a few external IPs for reachability
 
 2. Get-NetworkTroubleshoot - This is a longer script that can do some of the functionality of Get-NetTest but with more specific options. You can choose a few options from loopback, DNS, external IP, check neighbors with ARP, get network information to name a few.
 
