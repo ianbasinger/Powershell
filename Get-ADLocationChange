@@ -1,0 +1,11 @@
+function Get-ADLocationChange
+{
+    Write-Host "Script to move a single AD user to another OU"
+    $ADusername = Read-Host "Please enter samAccountName for the user that needs to be moved"
+    $targetpath = Read-Host "Please enter the OU directory they need to be moved to"
+
+    Get-ADUser -Identity $ADusername | Move-ADObject -TargetPath "$targetpath"
+    # This will move them to another OU, $targetpath is the OU directory you need to declare
+    Get-ADUser -Filter $ADusername -SearchBase "$targetpath" -Properties l | Foreach {Set-ADUser $_ -Office $_.l -whatif}
+    # This updates the office field
+}
