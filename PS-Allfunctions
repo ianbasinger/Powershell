@@ -1,0 +1,262 @@
+# All functions I want to incoporate to my .ps1 profile, will create a GUI program with interactable UI to make it easier to use for common functions.
+function Get-ADGroupCompare
+# Function compares 2 AD usernames and will tell you what AD groups they both have in common, and which ones they have that are different
+    {
+        Write-Host "Compares 2 AD user accounts for group membership" -ForegroundColor Magenta
+
+        $Identity1 = $input = $(Write-Host "Please enter AD User 1" -NoNewLine) + $(Write-Host " EX: John.Smith " -ForegroundColor Green -NoNewLine; Read-Host)
+
+        $Identity2 = $input = $(Write-Host "Please enter AD User 2" -NoNewLine) + $(Write-Host " EX: Jacob.Ryan " -ForegroundColor Red -NoNewLine; Read-Host)
+
+        $user1 = (Get-ADPrincipalGroupMembership -Identity $Identity1 | select Name | Sort-Object -Property Name).Name
+        Write-Verbose ($user1 -join "; ")
+
+        $user2 = (Get-ADPrincipalGroupMembership -Identity $Identity2 | select Name | Sort-Object -Property Name).Name
+        Write-Verbose ""
+        Write-Verbose ($user2 -join "; ")
+
+        $SameGroups = (Compare-Object $user1 $user2 -PassThru -IncludeEqual -ExcludeDifferent)
+
+        Write-Verbose ""
+        Write-Verbose ($SameGroups -join "; ")
+
+        $UniqueID1 = (Compare-Object $user1 $user2 -PassThru | where {$_.SideIndicator -eq "<="})
+        Write-Verbose ""
+
+        Write-Verbose ($UniqueID1 -join "; ")
+        $UniqueID2 = (Compare-Object $user1 $user2 -PassThru | where {$_.SideIndicator -eq "=>"})
+
+        Write-Verbose ""
+        Write-Verbose ($UniqueID2 -join "; ")
+        $ID1Name = (Get-ADUser -Identity $Identity1 | Select Name).Name
+        Write-Verbose ""
+        Write-Verbose ($ID1Name -join "; ")
+        $ID2Name = (Get-ADUser -Identity $Identity2 | Select Name).Name
+        Write-Verbose ""
+        Write-Verbose ($ID2Name -join "; ")
+
+        Write-Host "--------------------------------------------------------------------------" -ForegroundColor Magenta
+        Write-Host "[$ID1Name] and [$ID2Name] have the following groups in common:"
+        Write-Host "--------------------------------------------------------------------------" -ForegroundColor Magenta
+        $SameGroups
+        Write-Host ""
+
+        Write-Host "--------------------------------------------------------------------------" -ForegroundColor Green
+        Write-Host "The following groups are unique to [$ID1Name]:"
+        Write-Host "--------------------------------------------------------------------------" -ForegroundColor Green
+        $UniqueID1
+        Write-Host ""
+        Write-Host "--------------------------------------------------------------------------" -ForegroundColor Red
+        Write-Host "The following groups are unique to [$ID2Name]:"
+        Write-Host "--------------------------------------------------------------------------" -ForegroundColor Red
+        $UniqueID2
+    }
+
+
+function Get-ADLockoutCheck
+# Function to check if an AD user is locked out, bad password attempts, when last logged in to a domain computer, and when password was last set
+    {
+        $samAccountName = Read-Host -Prompt "Enter AD Account Name Here" # Input username to specify the variable
+        # Input username to specify the variable
+
+        Get-ADUser $samAccountName -Properties AccountLockoutTime,LastBadPasswordAttempt,BadPwdCount,LockedOut
+        # Checks last bad password attempts and locked out and duration of lockout as well
+
+        Get-ADUser -Identity $samAccountName -Properties PasswordLastSet | ft Name, PasswordLastSet
+        # Check when password was last set, gives date and time
+
+        Get-ADUser -Identity $samAccountName -Properties LastLogon | Select Name, @{Name='LastLogon';Expression={[DateTime]::FromFileTime($_.LastLogon)}}
+        # Checks to see when they logged in last on a computer on the domain
+    }
+
+
+function Get-ADPasswordReset
+# This will reset an AD password for a single user, just type their AD username into console to reset
+    {
+        $samAccountName = Read-Host -Prompt "Enter AD Account Name for Password Reset Here"
+
+        # Warning confirmation on the change, Y/N to confirm
+ 
+        Write-Warning "Confirm the information is correct before proceeding, this is a single password reset" -WarningAction Inquire
+
+        # Forced to input AD account name that needs a reset
+
+        $newPassword = ConvertTo-SecureString -AsPlainText "Password" -Force
+
+        # Password change to the new password specified
+
+        Set-ADAccountPassword -Identity $samAccountName -NewPassword $newPassword -Reset
+
+        # Calls on the new password listed above
+
+        Set-AdUser -Identity $samAccountName -ChangePasswordAtLogon $true
+
+        # Forces user to change password at next login
+
+        Write-Host " AD Password has been reset for: "$samAccountName
+
+        # Writes to PS window stating the changes took affect
+
+        Set-Clipboard "Reset to Password"
+
+        # Copy text to clipboard to put in a ticket or something else
+    }
+
+
+function Get-NetworkTest
+# This function will conduct some common network troubleshooting, and is meant to be ran locally on the computer. It goes in order from the OSI layer starting at the Physical Layer.
+{
+    Write-Host "This will conduct network troubleshooting in order from : Loopback test, Gateway test, RFC1918 Public IP Ping test, DNS resolving test, and will stop at whichever step it failed" -ForegroundColor Yellow
+
+    Pause
+    #====================================================================Start of loopback test====================================================================#
+    Write-Host "Conducting loopback test to 127.0.0.1..."
+    
+    if (Test-Connection -Quiet 127.0.0.1)
+        # ICMP Ping to check physical layer problems, checks loopback or localhost interface, if this is down then most likely issue with NIC or drivers potentially
+        {
+            Write-Host "Loopback test to 127.0.0.1 successfull, loopback is working" -ForegroundColor Green
+        }
+        else
+        {
+            Write-Host "Loopback test to 127.0.0.1 unsuccessfull, loopback isn't working" -ForegroundColor Red
+        }
+    #====================================================================End of loopback test====================================================================#
+
+    #====================================================================Start default gateway test====================================================================#
+    $defaultgateway = Get-WmiObject -Class Win32_IP4RouteTable | 
+    where { $_.destination -eq '0.0.0.0' -and $_.mask -eq '0.0.0.0'} | 
+    Sort-Object metric1 | select nexthop, metric1, interfaceindex | Select-Object -First 1 | Select-Object -ExpandProperty nexthop
+    # This pulls up Windows registry keys and looks for the IPv4 route table, pulls the table and selects the highest metric (so first priority default gateway)
+    # After pulling default gateway and most likely candidate, filters down to first IP address and selects it, puts into variable to be used for ping
+
+    Write-Host "Pinging default gateway..."
+
+        if(Test-Connection -Quiet $defaultgateway)
+        # ICMP ping to default gateway to see if we can even reach the gateway, if not then WAN connectivity isn't likely
+        {
+            Write-Host "Default gateway was reachable, no issue reaching default gateway" -ForegroundColor Green
+        }
+        else
+        {
+            Write-Host "Default gateway was unreachable, issue reaching default gateway" -ForegroundColor Red
+        }
+    #====================================================================End of default gateway test====================================================================#
+
+    #====================================================================Start of public IP test====================================================================#
+            Write-Host "Attempting to ping a public IP address.."
+             # ICMP ping to external destination IP addresses to check for network connectivity
+        if (Test-Connection -Quiet 1.1.1.1)
+        {
+            Write-Host "Ping for 1.1.1.1 was successfull, stopping test" -ForegroundColor Green
+        }
+        else
+        {
+            Write-Host "Ping for 1.1.1.1 was unsuccessfull, trying another.." -ForegroundColor Red
+        if (Test-Connection -Quiet 8.8.8.8)
+        {
+            Write-Host "Ping for 8.8.8.8 was successfull, stopping test" -ForegroundColor Green
+        }
+        else
+        {
+            Write-Host "Ping for 8.8.8.8 was unsuccessfull, trying another.." -ForegroundColor Red
+        if (Test-Connection -Quiet 9.9.9.9)
+        {
+            Write-Host "Ping for 9.9.9.9 was successfull, stopping test" -ForegroundColor Green
+        }
+        else
+        {
+            Write-Host "Ping for 3 seperate destination IPs was unsuccessfull, most likely issue with device" -ForegroundColor Red
+        }
+    }
+}
+    #====================================================================End of public IP test====================================================================#
+
+    #====================================================================Start of DNS test====================================================================#
+        Write-Host "Attempting to resolve DNS names..."
+        # ICMP ping to external DNS names to see if DNS resolution is working
+        if (Test-Connection -Quiet google.com)
+        {
+            Write-Host "DNS Resolution for Google.com was successfull, stopping test" -ForegroundColor Green
+        }
+        else
+        {
+            Write-Host "DNS Resolution for Google.com was unsuccessfull, trying another.." -ForegroundColor Red
+        if (Test-Connection -Quiet quad9.com)
+        {
+            Write-Host "DNS Resolution for Quad9.com was successfull, stopping test" -ForegroundColor Green
+        }
+        else
+        {
+            Write-Host "DNS Resolution for Quad9.com was unsuccessfull, trying another.." -ForegroundColor Red
+        if (Test-Connection -Quiet one.one.one.one)
+        {
+            Write-Host "DNS Resolution for Cloudflare.com was successfull, stopping test" -ForegroundColor Green
+        }
+        else
+        {
+            Write-Host "DNS Resolution for Cloudflare.com was unsuccessfull, that is 3 providers with this issue. DNS is most likely not working on this device" -ForegroundColor Red
+
+    #====================================================================End of DNS test====================================================================#
+            }
+        }
+    }
+}
+
+function Get-StrongPassword ([Parameter(Mandatory=$true)][int]$PasswordLength)
+# Function Generates strong password within certain complexity limits, outputs to PS console
+    {
+        Add-Type -AssemblyName System.Web
+        $PassComplexCheck = $false
+        do {
+        $newPassword=[System.Web.Security.Membership]::GeneratePassword($PasswordLength,1)
+        If ( ($newPassword -cmatch "[A-Z\p{Lu}\s]") `
+        -and ($newPassword -cmatch "[a-z\p{Ll}\s]") `
+        -and ($newPassword -match "[\d]") `
+        -and ($newPassword -match "[^\w]")
+        )
+        {
+        $PassComplexCheck=$True
+        }
+        } While ($PassComplexCheck -eq $false)
+        return $newPassword
+    }
+
+
+function Get-ADComputerInfo
+# Function is ran to gather information on a computer. Lots of information including TPM info, BIOS version, hardware stats, network stats, etc. 
+	
+# Reminder to myself to see about adding more info if possible, monitor/display settings and potentially audio device settings as well. Not sure if possible. 8/25
+    {
+        $ComputerName = Read-Host -Prompt "Enter computer name"
+        Get-ADComputer $ComputerName
+        Get-ComputerInfo $ComputerName
+        Get-Tpm $ComputerName 
+
+        if(!$ComputerName)
+        {
+        $ComputerName = $env:COMPUTERNAME
+        $filter = '^cim|^PSComp'
+        }
+
+        Foreach($computer in $ComputerName)
+        {
+        $CimParams = @{
+        Namespace = 'root\wmi'
+        ClassName = 'wmimonitorid'
+        }
+
+        if($computer -notmatch $env:COMPUTERNAME)
+        {
+        $CimParams.Add('ComputerName',$computer)
+        $filter = '^cim'
+        }
+
+        Get-CimInstance @CimParams | ForEach {
+        $_.psobject.Properties | where name -notmatch $filter | ForEach -Begin {$ht = [ordered]@{}} -Process {
+        $value = if($_.value -is [System.Array]){[System.Text.Encoding]::ASCII.GetString($_.value)}else{$_.value}
+        $ht.add($_.name,$value)
+        } -End {[PSCustomObject]$ht}
+        }
+    }
+}
