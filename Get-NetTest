@@ -1,100 +1,110 @@
-# This function will conduct some common network troubleshooting, and is meant to be ran locally on the computer. It goes in order from the OSI layer starting at the Physical Layer.
-
+# This function will conduct some common network troubleshooting, and is meant to be ran locally on the computer. It goes in order from the OSI layer starting at the physical layer
+#====================================================================Start of function====================================================================#
 function Get-NetworkTest
-{
-    Write-Host "This will conduct network troubleshooting in order from : Loopback test, Gateway test, RFC1918 Public IP Ping test, DNS resolving test, and will stop at whichever step it failed" -ForegroundColor Yellow
+    {
+        Write-Host "This will conduct network troubleshooting in order from : Loopback test, Gateway test, RFC1918 Public IP Ping test, DNS resolving test, and will stop at whichever step it failed" -ForegroundColor Yellow
 
-    Pause
-    #====================================================================Start of loopback test====================================================================#
-    Write-Host "Conducting loopback test to 127.0.0.1..."
-    
-    if (Test-Connection -Quiet 127.0.0.1)
-        # ICMP Ping to check physical layer problems, checks loopback or localhost interface, if this is down then most likely issue with NIC or drivers potentially
-        {
-        Write-Host "Loopback test to 127.0.0.1 successfull, loopback is working" -ForegroundColor Green
-        }
-        else
-        {
-        Write-Host "Loopback test to 127.0.0.1 unsuccessfull, loopback isn't working" -ForegroundColor Red
-        }
-    #====================================================================End of loopback test====================================================================#
+        try {$ip_address_ethernet = (Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet).IPAddress}
+                catch {Write-Host "No Ethernet adapter detected, unable to get IPv4 address" -ForegroundColor Red}
 
-    #====================================================================Start default gateway test====================================================================#
-    $defaultgateway = Get-WmiObject -Class Win32_IP4RouteTable | 
-    where { $_.destination -eq '0.0.0.0' -and $_.mask -eq '0.0.0.0'} | 
-    Sort-Object metric1 | select nexthop, metric1, interfaceindex | Select-Object -First 1 | Select-Object -ExpandProperty nexthop
-    # This pulls up Windows registry keys and looks for the IPv4 route table, pulls the table and selects the highest metric (so first priority default gateway)
-    # After pulling default gateway and most likely candidate, filters down to first IP address and selects it, puts into variable to be used for ping
-
-    Write-Host "Pinging default gateway..."
-
-        if(Test-Connection -Quiet $defaultgateway)
-        # ICMP ping to default gateway to see if we can even reach the gateway, if not then WAN connectivity isn't likely
-        {
-            Write-Host "Default gateway was reachable, no issue reaching default gateway" -ForegroundColor Green
-        }
-        else
-        {
-            Write-Host "Default gateway was unreachable, issue reaching default gateway" -ForegroundColor Red
-        }
-    #====================================================================End of default gateway test====================================================================#
-
-    #====================================================================Start of public IP test====================================================================#
-            Write-Host "Attempting to ping a public IP address.."
-             # ICMP ping to external destination IP addresses to check for network connectivity
-        if (Test-Connection -Quiet 1.1.1.1)
-        {
-            Write-Host "Ping for 1.1.1.1 was successfull, stopping test" -ForegroundColor Green
-        }
-        else
-        {
-            Write-Host "Ping for 1.1.1.1 was unsuccessfull, trying another.." -ForegroundColor Red
-        if (Test-Connection -Quiet 8.8.8.8)
-        {
-            Write-Host "Ping for 8.8.8.8 was successfull, stopping test" -ForegroundColor Green
-        }
-        else
-        {
-            Write-Host "Ping for 8.8.8.8 was unsuccessfull, trying another.." -ForegroundColor Red
-        if (Test-Connection -Quiet 9.9.9.9)
-        {
-            Write-Host "Ping for 9.9.9.9 was successfull, stopping test" -ForegroundColor Green
-        }
-        else
-        {
-            Write-Host "Ping for 3 seperate destination IPs was unsuccessfull, most likely issue with device" -ForegroundColor Red
+                if ($ip_address_ethernet.StartsWith('169.254'))
+                {
+                    Write-Host "You have an APIPA link local address, check DHCP scope or other issues relating to DHCP, your address won't be routable and you can only reach intranet"
                 }
-             }
-        }
-    #====================================================================End of public IP test====================================================================#
 
-    #====================================================================Start of DNS test====================================================================#
-        Write-Host "Attempting to resolve DNS names..."
-        # ICMP ping to external DNS names to see if DNS resolution is working
-        if (Test-Connection -Quiet google.com)
-        {
-            Write-Host "DNS Resolution for Google.com was successfull, stopping test" -ForegroundColor Green
-        }
-        else
-        {
-            Write-Host "DNS Resolution for Google.com was unsuccessfull, trying another.." -ForegroundColor Red
-        if (Test-Connection -Quiet quad9.com)
-        {
-            Write-Host "DNS Resolution for Quad9.com was successfull, stopping test" -ForegroundColor Green
-        }
-        else
-        {
-            Write-Host "DNS Resolution for Quad9.com was unsuccessfull, trying another.." -ForegroundColor Red
-        if (Test-Connection -Quiet one.one.one.one)
-        {
-            Write-Host "DNS Resolution for Cloudflare.com was successfull, stopping test" -ForegroundColor Green
-        }
-        else
-        {
-            Write-Host "DNS Resolution for Cloudflare.com was unsuccessfull, that is 3 providers with this issue. DNS is most likely not working on this device" -ForegroundColor Red
 
-    #====================================================================End of DNS test====================================================================#
+        Write-Host "Your IPv4 Ethernet address is: $ip_address_ethernet" -ForegroundColor Green
+        #====================================================================Start of loopback test====================================================================#
+        Write-Host "Conducting loopback test to 127.0.0.1..."
+        
+        if (Test-Connection -Quiet 127.0.0.1)
+            # ICMP Ping to check physical layer problems, checks loopback or localhost interface, if this is down then most likely issue with NIC or drivers potentially
+            {
+            Write-Host "Loopback test to 127.0.0.1 successfull, loopback is working" -ForegroundColor Green
+            }
+            else
+            {
+            Write-Host "Loopback test to 127.0.0.1 unsuccessfull, loopback isn't working" -ForegroundColor Red
+            }
+        #====================================================================End of loopback test====================================================================#
+
+        #====================================================================Start default gateway test====================================================================#
+        $defaultgateway = Get-WmiObject -Class Win32_IP4RouteTable | 
+        where { $_.destination -eq '0.0.0.0' -and $_.mask -eq '0.0.0.0'} | 
+        Sort-Object metric1 | select nexthop, metric1, interfaceindex | Select-Object -First 1 | Select-Object -ExpandProperty nexthop
+        # This pulls up Windows registry keys and looks for the IPv4 route table, pulls the table and selects the highest metric (so first priority default gateway)
+        # After pulling default gateway and most likely candidate, filters down to first IP address and selects it, puts into variable to be used for ping
+
+        Write-Host "Pinging default gateway..."
+
+            if(Test-Connection -Quiet $defaultgateway)
+            # ICMP ping to default gateway to see if we can even reach the gateway, if not then WAN connectivity isn't likely
+            {
+                Write-Host "Default gateway was reachable, no issue reaching default gateway" -ForegroundColor Green
+            }
+            else
+            {
+                Write-Host "Default gateway was unreachable, issue reaching default gateway" -ForegroundColor Red
+            }
+        #====================================================================End of default gateway test====================================================================#
+
+        #====================================================================Start of public IP test====================================================================#
+                Write-Host "Attempting to ping a public IP address.."
+                # ICMP ping to external destination IP addresses to check for network connectivity
+            if (Test-Connection -Quiet 1.1.1.1)
+            {
+                Write-Host "Ping for 1.1.1.1 was successfull, stopping test" -ForegroundColor Green
+            }
+            else
+            {
+                Write-Host "Ping for 1.1.1.1 was unsuccessfull, trying another.." -ForegroundColor Red
+            if (Test-Connection -Quiet 8.8.8.8)
+            {
+                Write-Host "Ping for 8.8.8.8 was successfull, stopping test" -ForegroundColor Green
+            }
+            else
+            {
+                Write-Host "Ping for 8.8.8.8 was unsuccessfull, trying another.." -ForegroundColor Red
+            if (Test-Connection -Quiet 9.9.9.9)
+            {
+                Write-Host "Ping for 9.9.9.9 was successfull, stopping test" -ForegroundColor Green
+            }
+            else
+            {
+                Write-Host "Ping for 3 seperate destination IPs was unsuccessfull, most likely issue with device" -ForegroundColor Red
+                    }
+                }
+            }
+        #====================================================================End of public IP test====================================================================#
+
+        #====================================================================Start of DNS test====================================================================#
+            Write-Host "Attempting to resolve DNS names..."
+            # ICMP ping to external DNS names to see if DNS resolution is working
+            if (Test-Connection -Quiet google.com)
+            {
+                Write-Host "DNS Resolution for Google.com was successfull, stopping test" -ForegroundColor Green
+            }
+            else
+            {
+                Write-Host "DNS Resolution for Google.com was unsuccessfull, trying another.." -ForegroundColor Red
+            if (Test-Connection -Quiet quad9.com)
+            {
+                Write-Host "DNS Resolution for Quad9.com was successfull, stopping test" -ForegroundColor Green
+            }
+            else
+            {
+                Write-Host "DNS Resolution for Quad9.com was unsuccessfull, trying another.." -ForegroundColor Red
+            if (Test-Connection -Quiet one.one.one.one)
+            {
+                Write-Host "DNS Resolution for Cloudflare.com was successfull, stopping test" -ForegroundColor Green
+            }
+            else
+            {
+                Write-Host "DNS Resolution for Cloudflare.com was unsuccessfull, that is 3 providers with this issue. DNS is most likely not working on this device" -ForegroundColor Red
+
+        #====================================================================End of DNS test====================================================================#
             }
         }
     }
 }
+#====================================================================End of function====================================================================#
