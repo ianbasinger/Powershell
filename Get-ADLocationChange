@@ -1,11 +1,17 @@
+#====================================================================Start of function====================================================================#
+# This function will change a users AD location and OU, updates office field as well
 function Get-ADLocationChange
+
 {
-    Write-Host "Script to move a single AD user to another OU"
+    Write-Host "Script to move a single AD user to another OU and update their Office field" -ForegroundColor Cyan
     $ADusername = Read-Host "Please enter samAccountName for the user that needs to be moved"
     $targetpath = Read-Host "Please enter the OU directory they need to be moved to"
 
-    Get-ADUser -Identity $ADusername | Move-ADObject -TargetPath "$targetpath"
+    try{Get-ADUser -Identity $ADusername | Move-ADObject -TargetPath "$targetpath"}
+    catch{Write-Host "Error moving user to new OU, please check the OU path and try again"}
     # This will move them to another OU, $targetpath is the OU directory you need to declare
-    Get-ADUser -Filter $ADusername -SearchBase "$targetpath" -Properties l | Foreach {Set-ADUser $_ -Office $_.l -whatif}
+    try{Get-ADUser -Filter $ADusername -SearchBase "$targetpath" -Properties l | Foreach {Set-ADUser $_ -Office $_.l -whatif}}
+    catch{Write-Host "Error updating office field, please check the OU path and try again"}
     # This updates the office field
 }
+#====================================================================End of function====================================================================#
