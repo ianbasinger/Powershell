@@ -1,16 +1,20 @@
-# Function to check if an AD user is locked out, bad password attempts, when last logged in to a domain computer, and when password was last set
-
+#====================================================================Start of function====================================================================#
 function Get-ADLockoutCheck
-{
-$samAccountName = Read-Host -Prompt "Enter AD Account Name Here" # Input username to specify the variable
-# Input username to specify the variable
+# Function to check if an AD user is locked out, bad password attempts, when last logged in to a domain computer, and when password was last set
+    {
+        $ADusername = Read-Host -Prompt "Enter AD Account Name Here"
+        # Input AD username or it's also called samAccountName to specify the variable to search the AD for $samAccountName
 
-Get-ADUser $samAccountName -Properties AccountLockoutTime,LastBadPasswordAttempt,BadPwdCount,LockedOut
-# Checks last bad password attempts and locked out and duration of lockout as well
+        try{Get-ADUser $ADusername -Properties AccountLockoutTime,LastBadPasswordAttempt,BadPwdCount,LockedOut}
+        catch{Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red}
+        # Checks last bad password attempts and locked out and duration of lockout as well
 
-Get-ADUser -Identity $samAccountName -Properties PasswordLastSet | ft Name, PasswordLastSet
-# Check when password was last set, gives date and time
+        try{Get-ADUser -Identity $ADusername -Properties PasswordLastSet | ft Name, PasswordLastSet}
+        catch{Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red}
+        # Check when password was last set, gives date and time
 
-Get-ADUser -Identity $samAccountName -Properties LastLogon | Select Name, @{Name='LastLogon';Expression={[DateTime]::FromFileTime($_.LastLogon)}}
-# Checks to see when they logged in last on a computer on the domain
-}
+        try{Get-ADUser -Identity $ADusername -Properties LastLogon | Select Name, @{Name='LastLogon';Expression={[DateTime]::FromFileTime($_.LastLogon)}}}
+        catch{Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red}
+        # Checks to see when they logged in last on a computer on the domain
+    }
+#====================================================================Start of function====================================================================#
