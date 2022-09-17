@@ -6,12 +6,13 @@ function Get-NetworkTroubleshoot
 
         # Quick ipconfig to show us some basic starting info before proceeding, check for APIPA or any other issues here for example, check DNS and DHCP etc and more
 
-        do  {
-                $ip_address_ethernet = (Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet).IPAddress
+        do  {   
+                try {$ip_address_ethernet = (Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet).IPAddress}
+                catch {Write-Host "No Ethernet adapter detected, unable to get IPv4 address" -ForegroundColor Red}
                 # This gets our IPv4 address for the Ethernet interface to use for troubleshooting
                 $Title = 'Network Troubleshooting'
                 Write-Host "================$Title================" -ForegroundColor Cyan
-                Write-Host "Your IPv4 address is: $ip_address_ethernet" -ForegroundColor Green
+                Write-Host "Your IPv4 Ethernet address is: $ip_address_ethernet" -ForegroundColor Green
                 Write-Host "1: Press '1' to Ping loopback address on local computer" -ForegroundColor Yellow
                 Write-Host "2: Press '2' to Ping a destination IP" -ForegroundColor Yellow
                 Write-Host "3: Press '3' for a Tracert on a destination IP" -ForegroundColor Yellow
