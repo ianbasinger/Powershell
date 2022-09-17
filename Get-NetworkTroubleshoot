@@ -1,4 +1,3 @@
-
 #====================================================================Start of function====================================================================#
 # Function is a switch condition setup for troubleshooting. Basic stuff that you can do with some number commands to conduct some troubleshooting
 # If you wish to use the WLAN portion, you need to launch PS with elevated admin privledges
@@ -148,3 +147,4 @@ function Get-NetworkTroubleshoot
                 until ($selection -eq 'q')
         # End of entire function
     }
+#====================================================================End of function====================================================================#
