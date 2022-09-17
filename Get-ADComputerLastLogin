@@ -1,8 +1,11 @@
+#====================================================================Start of function====================================================================#
 # This will check a computers (AD joined only) last login date. Function is small currently and I will add more checks and functionality, currently there isn't much utility.
 function Get-ADComputerLastLogin
-{
-    $computername = Read-Host "Enter the computer name here"
-    # $computername is the AD distinguished name for the computer object that you will give it
-    Get-ADComputer $computername -Properties * | Sort LastLogon | Select Name, LastLogonDate,@{Name='LastLogon';Expression={[DateTime]::FromFileTime($_.LastLogon)}}
-    # Checks for lastlogon date and filters down to just what we need to see
-}
+    {
+        $computername = Read-Host "Enter the computer name here"
+        # $computername is the AD distinguished name for the computer object that you will give it
+        try{Get-ADComputer $computername -Properties * | Sort LastLogon | Select Name, LastLogonDate,@{Name='LastLogon';Expression={[DateTime]::FromFileTime($_.LastLogon)}}}}
+        catch{Write-Host "Computer not found"}
+        # Checks for lastlogon date and filters down to just what we need to see
+    }
+#====================================================================End of function====================================================================#
