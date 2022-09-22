@@ -261,6 +261,7 @@ function Get-NetworkTest
 #====================================================================End of function====================================================================#
 
 #====================================================================Start of function====================================================================#
+#====================================================================Start of function====================================================================#
 # Function Generates strong password within certain complexity limits, outputs to PS console
 function Get-StrongPassword ([Parameter(Mandatory=$true)][int]$PasswordLength)
     {
@@ -281,6 +282,35 @@ function Get-StrongPassword ([Parameter(Mandatory=$true)][int]$PasswordLength)
     }
 #====================================================================End of function====================================================================#
 
+#====================================================================Start of function====================================================================#
+function GenerateNewPassword
+# This will generate 1 new complex password, and export output to a .txt file we specify
+    {
+        try
+        {
+            Add-Type -AssemblyName System.Web
+
+            $filepath = 'C:\Users\ian.basinger\Desktop\Powershell stuff\NewPasswords.txt'
+
+            try {[System.Web.Security.Membership]::GeneratePassword(8,2)} catch{Write-Warning -Message 'Issue with .NET Framework'} try{Out-File -FilePath $filepath -Append} catch{Write-Warning -Message 'Unable to get filepath, did you specify the correct file path for the file?'}
+                #.NET Framework generates the password for us, outputs to specified file path, will catch errors if issue with .NET or filepath issues.                                           
+
+                    Write-Host('Generated new password successfully...')
+        }
+        
+        catch {Write-Warning -Message 'Unable to generate new password, something unexpected went wrong...'}
+# End of function
+    }
+
+function GenerateNewPasswords
+# This is just a for loop for 10 times, to get us 10 new passwords
+    {
+
+    for ($x='10' ;$x.length -le 11;$x=$x+'x'){GenerateNewPassword}
+
+# End of function
+    }
+#====================================================================End of function====================================================================#
 
 #====================================================================Start of function====================================================================#
 # This will reset an AD password for a single user, just type username into console to reset
@@ -404,7 +434,6 @@ function Get-ADPasswordResetBulkComplex
 }
 #====================================================================End of function====================================================================#
 
-
 #====================================================================Start of function====================================================================#
 function Get-ADLockoutCheck
 # Function to check if an AD user is locked out, bad password attempts, when last logged in to a domain computer, and when password was last set
@@ -425,7 +454,6 @@ function Get-ADLockoutCheck
         # Checks to see when they logged in last on a computer on the domain
     }
 #====================================================================End of function====================================================================#
-
 
 #====================================================================Start of function====================================================================#
 # This function will change a users AD location and OU, updates office field as well
