@@ -258,9 +258,36 @@ function Get-NetworkTest
         }
     }
 }
-#====================================================================End of function====================================================================#
 
 #====================================================================Start of function====================================================================#
+function Get-WLANPasswords()
+# This will grab your WiFi profile and show your various BSSID WLAN credentials/passwords.
+    {
+
+        param(
+            [Parameter(Mandatory=$false)]
+            [string] $OutFile
+        )
+
+        $output = (netsh wlan show profiles) `
+        | Select-String "\:(.+)$" `
+        | %{$name=$_.Matches.Groups[1].Value.Trim(); $_} `
+        | %{(netsh wlan show profile name="$name" key=clear)} `
+        | Select-String "Key Content\W+\:(.+)$" `
+        | %{$pass=$_.Matches.Groups[1].Value.Trim(); $_} `
+        | %{[PSCustomObject]@{ PROFILE_NAME=$name;PASSWORD=$pass }} `
+        | Format-Table -AutoSize
+
+        if($PSBoundParameters.ContainsKey("OutFile"))
+        {
+            $output | Out-File $OutFile
+        }
+        else{
+            $output
+        }
+    }
+#====================================================================End of function====================================================================#
+
 #====================================================================Start of function====================================================================#
 # Function Generates strong password within certain complexity limits, outputs to PS console
 function Get-StrongPassword ([Parameter(Mandatory=$true)][int]$PasswordLength)
