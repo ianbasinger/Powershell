@@ -1,20 +1,19 @@
 #====================================================================Start of function====================================================================#
 function Get-ADLockoutCheck
-# Function to check if an AD user is locked out, bad password attempts, when last logged in to a domain computer, and when password was last set
-    {
-        $ADusername = Read-Host -Prompt "Enter AD Account Name Here"
-        # Input AD username or it's also called samAccountName to specify the variable to search the AD for $samAccountName
+{
 
-        try{Get-ADUser $ADusername -Properties AccountLockoutTime,LastBadPasswordAttempt,BadPwdCount,LockedOut}
-        catch{Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red}
-        # Checks last bad password attempts and locked out and duration of lockout as well
+$adUserArgs = @{
+    Properties = "AccountLockoutTime", "LastBadPasswordAttempt", "BadPWDCount", "LockedOut", "PasswordLastSet"
+}
 
-        try{Get-ADUser -Identity $ADusername -Properties PasswordLastSet | ft Name, PasswordLastSet}
-        catch{Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red}
-        # Check when password was last set, gives date and time
+$adUserName = Read-Host -Prompt "Enter AD Account Name Here"
+# Our AD user samAccountName we will input
 
-        try{Get-ADUser -Identity $ADusername -Properties LastLogon | Select Name, @{Name='LastLogon';Expression={[DateTime]::FromFileTime($_.LastLogon)}}}
-        catch{Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red}
-        # Checks to see when they logged in last on a computer on the domain
-    }
+Get-ADUser -Identity $adUserName @adUserArgs
+# Check when password was last set, gives date and time, using the PS splat we made earlier (@adUserArgs)
+
+Get-ADUser -Identity $adUserName -Properties LastLogon | Select Name, @{Name='LastLogon';Expression={[DateTime]::FromFileTime($_.LastLogon)}}
+# Checks to see when they logged in last
+
+}
 #====================================================================Start of function====================================================================#
