@@ -1,0 +1,27 @@
+## This function scans for a specified Windows Event ID that occurred in the last (7) days and returns the results. Useful for troubleshooting.
+function Get-Events
+{
+    # Prompt for event ID
+    $EventID = Read-Host "Enter event ID"
+
+    try {
+      ##Get events with specified event ID in the last 7 days
+      $Events = Get-WinEvent -FilterHashtable @{LogName='System'; ID=$EventID; StartTime=(Get-Date).AddDays(-7)}
+
+      # Check if any events were found
+      if ($Events) {
+        # Display timestamp and relevant information for each event
+        foreach ($Event in $Events) {
+          Write-Output "$($Event.TimeCreated) $($Event.Message)"
+        }
+      }
+      else {
+        ##No events were found
+        Write-Output "No events with event ID $EventID were found in the last 7 days"
+      }
+    }
+    catch {
+      ##An error occurred
+      Write-Output "An error occurred: $($_.Exception.Message)"
+    }
+}
