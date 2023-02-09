@@ -1,0 +1,32 @@
+## This is a script that scans for all IP addresses in a range specified. Generally you can figure out what subnet your on with ipconfig /all and then modify the script
+## With the start and end of the usable hosts on the subnet.
+## Keep in mind if some of the hosts are on another VLAN or subnet for example, as depending on the LAN configuration then that could affect ping reachability to those hosts
+
+$filename = "$env:userprofile\Desktop\ip-address.txt"
+
+## File path
+$hosts = @{}
+
+for ($i = 1; $i -le 255; $i++) {
+## Loop through all specified IP addresses, in my case all I need to loop through is 0-255 total on the 4th octet
+  $reply = Test-Connection -ComputerName "10.10.20.$i" -Count 1 -Quiet
+  if ($reply) {
+    $hosts["10.10.20.$i"] = $null
+  }
+}
+
+$worker = [System.Threading.Tasks.Task]::Factory.StartNew({
+  foreach ($ip in $hosts.Keys) {
+    $hosts[$ip] = [System.Net.Dns]::GetHostByAddress($ip).HostName
+    ## Name resolution for hosts that replied back to our ping
+  }
+})
+
+$worker.Wait()
+
+foreach ($ip in $hosts.Keys) {
+  "$ip is alive ($($hosts[$ip]))" | Out-File -FilePath $filename -Append
+  ## Output to the .txt file specified earlier
+}
+
+Write-Output "Done! Check the file $filename for the results."
