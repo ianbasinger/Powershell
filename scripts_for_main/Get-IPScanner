@@ -1,5 +1,5 @@
 ## Script will scan for an indicated range of IP addresses, generally a subnet in most use cases.
-## If your LAN has other subnets, VLANs, etc. then some hosts may not echo back but could still be online, keep that in mind
+## If your network has other subnets, VLANs, etc. then some hosts may not echo back but could still be online, keep that in mind
 
 $ips_start = Read-Host "Enter the starting IP address (e.g., 10.1.1.1)"
 ## Asks for user input to declare start of subnet to scan
