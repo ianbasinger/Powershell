@@ -2,7 +2,7 @@ function Generate-AzureAD-Users
 {
     #Set domain and password
     $domain = "yourdomain.com"
-    $password = "password-they-will-use"
+    $password = "password-user-will-use"
 
     # Define common first and last names
     $firstNames = "James", "John", "Robert", "Michael", "William", "David", "Richard", "Charles", "Joseph", "Thomas", "Christopher", "Daniel", "Paul", "Mark", "Donald", "George", "Kenneth", "Steven", "Edward", "Brian", "Ronald", "Anthony", "Kevin", "Jason", "Matthew", "Gary", "Timothy", "Jose", "Larry", "Jeffrey", "Frank", "Scott", "Eric", "Stephen", "Andrew", "Raymond", "Gregory", "Joshua", "Jerry", "Dennis", "Walter", "Patrick", "Peter", "Harold", "Douglas", "Henry", "Carl"
@@ -16,7 +16,7 @@ function Generate-AzureAD-Users
     Connect-AzureAD
 
     # Define common office locations and departments
-    $officeLocations = "New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia", "San Antonio", "San Diego", "Dallas", "San Jose"
+    $cities = "New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia", "San Antonio", "San Diego", "Dallas", "San Jose"
     $departments = "Marketing", "Sales", "Finance", "Human Resources", "Engineering", "Information Technology", "Customer Service", "Research and Development", "Operations", "Legal"
 
     # Connect to Azure AD, we need to do this first to interact with Azure AD
@@ -41,7 +41,7 @@ function Generate-AzureAD-Users
         }
         
         # Define user's office location and department
-        $officeLocation = $officeLocations | Get-Random
+        $city = $cities | Get-Random
         $department = $departments | Get-Random
 
         # Create new user object
@@ -57,7 +57,7 @@ function Generate-AzureAD-Users
                 'ForceChangePasswordNextLogin' = $false
                 'EnforceChangePasswordPolicy' = $true
             }
-            'OfficeLocation' = $officeLocation
+            'city' = $city
             'Department' = $department
         }
         
