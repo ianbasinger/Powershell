@@ -1,0 +1,56 @@
+function Generate-AzureAD-Users
+{
+    #Set domain and password
+    $domain = "yourdomain.com"
+    $password = "password-they-will-use"
+
+    # Define common first and last names
+    $firstNames = "James", "John", "Robert", "Michael", "William", "David", "Richard", "Charles", "Joseph", "Thomas", "Christopher", "Daniel", "Paul", "Mark", "Donald", "George", "Kenneth", "Steven", "Edward", "Brian", "Ronald", "Anthony", "Kevin", "Jason", "Matthew", "Gary", "Timothy", "Jose", "Larry", "Jeffrey", "Frank", "Scott", "Eric", "Stephen", "Andrew", "Raymond", "Gregory", "Joshua", "Jerry", "Dennis", "Walter", "Patrick", "Peter", "Harold", "Douglas", "Henry", "Carl"
+    $lastNames = "Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson", "Moore", "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia", "Martinez", "Robinson", "Clark", "Rodriguez", "Lewis", "Lee", "Walker", "Hall", "Allen", "Young", "King", "Wright", "Scott", "Green", "Baker", "Adams", "Nelson", "Carter", "Mitchell", "Perez", "Roberts", "Turner", "Phillips", "Campbell", "Parker", "Evans", "Edwards", "Collins", "Stewart", "Sanchez"
+
+    # Connect to Azure AD, we need to do this first to interact with Azure AD
+    Connect-AzureAD
+
+    # Loop through and create users, in this case it's 50 users
+    for ($i = 1; $i -le 50; $i++) {
+        # Generate random first and last name combination
+        $firstName = $firstNames | Get-Random
+        $lastName = $lastNames | Get-Random
+        
+        # Generate username and email address
+        $username = "$firstName.$lastName@$domain"
+        $email = $username
+        # Set mailNickname
+        $mailNickname = "$firstName.$lastName"
+        
+        # Check if user already exists
+        if (Get-AzureADUser -Filter "UserPrincipalName eq '$username'") {
+            Write-Host "User '$username' already exists."
+            continue
+        }
+        
+        # Create new user object
+        $newUser = @{
+            'DisplayName' = "$firstName $lastName"
+            'GivenName' = $firstName
+            'Surname' = $lastName
+            'UserPrincipalName' = $username
+            'MailNickname' = $mailNickname
+            'AccountEnabled' = $true
+            'PasswordProfile' = @{
+                'Password' = $password
+                'ForceChangePasswordNextLogin' = $true
+                'EnforceChangePasswordPolicy' = $true
+            }
+        }
+        
+        # Try to create user in Azure AD
+        try {
+            New-AzureADUser @newUser -ErrorAction Stop
+            Write-Host "User '$username' created successfully."
+        }
+        catch {
+            Write-Host "Error creating user '$username': $_"
+        }
+    }
+}
