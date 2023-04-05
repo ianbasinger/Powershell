@@ -1,0 +1,24 @@
+function Delete-AzureAD-Users
+# This will bulk delete ALL Azure AD users for a specified domain in your Azure AD tenant, with an exception for 1 user you specify.
+{
+    # Set the domain name
+    $domainName = "yourdomain.com"
+
+    # Connect to Azure AD
+    Connect-AzureAD
+
+    # Get all Azure AD users in the specified domain
+    $users = Get-AzureADUser | Where-Object {$_.UserPrincipalName.EndsWith("@$domainName")}
+
+    # Delete all users except for the specified user (in this case it's the global admin for the Azure AD tenant)
+    $excludedUser = "FirstName.LastName@$domainName"
+    foreach ($user in $users) {
+        if ($user.UserPrincipalName -ne $excludedUser) {
+            Write-Host "Deleting user:" $user.DisplayName
+            Remove-AzureADUser -ObjectId $user.ObjectId
+        }
+    }
+
+    # Disconnect from Azure AD
+    Disconnect-AzureAD
+}
