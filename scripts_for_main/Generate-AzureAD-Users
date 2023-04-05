@@ -1,6 +1,6 @@
 function Generate-AzureAD-Users
 {
-    # Set domain and password
+    #Set domain and password
     $domain = "yourdomain.com"
     $password = "password-they-will-use"
 
@@ -8,11 +8,18 @@ function Generate-AzureAD-Users
     $firstNames = "James", "John", "Robert", "Michael", "William", "David", "Richard", "Charles", "Joseph", "Thomas", "Christopher", "Daniel", "Paul", "Mark", "Donald", "George", "Kenneth", "Steven", "Edward", "Brian", "Ronald", "Anthony", "Kevin", "Jason", "Matthew", "Gary", "Timothy", "Jose", "Larry", "Jeffrey", "Frank", "Scott", "Eric", "Stephen", "Andrew", "Raymond", "Gregory", "Joshua", "Jerry", "Dennis", "Walter", "Patrick", "Peter", "Harold", "Douglas", "Henry", "Carl"
     $lastNames = "Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson", "Moore", "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia", "Martinez", "Robinson", "Clark", "Rodriguez", "Lewis", "Lee", "Walker", "Hall", "Allen", "Young", "King", "Wright", "Scott", "Green", "Baker", "Adams", "Nelson", "Carter", "Mitchell", "Perez", "Roberts", "Turner", "Phillips", "Campbell", "Parker", "Evans", "Edwards", "Collins", "Stewart", "Sanchez"
 
-    # Define office locations and departments
-    $officeLocations = "Seattle", "New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia", "San Antonio", "San Diego", "Dallas"
-    $departments = "Sales", "Marketing", "Engineering", "Finance", "HR", "IT", "Legal", "Operations", "Product Management", "Research and Development"
+    # Define possible office locations and departments
+    $officeLocations = "Seattle", "New York", "Los Angeles", "Chicago", "Houston", "San Francisco", "Miami", "Dallas", "Atlanta", "Boston"
+    $departments = "Sales", "Marketing", "Engineering", "Finance", "HR", "IT", "Operations", "Legal", "Customer Support", "Product"
 
-    # Connect to Azure AD
+    # Connect to Azure AD, we need to do this first to interact with Azure AD
+    Connect-AzureAD
+
+    # Define common office locations and departments
+    $officeLocations = "New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia", "San Antonio", "San Diego", "Dallas", "San Jose"
+    $departments = "Marketing", "Sales", "Finance", "Human Resources", "Engineering", "Information Technology", "Customer Service", "Research and Development", "Operations", "Legal"
+
+    # Connect to Azure AD, we need to do this first to interact with Azure AD
     Connect-AzureAD
 
     # Loop through and create users, in this case it's 50 users
@@ -33,14 +40,36 @@ function Generate-AzureAD-Users
             continue
         }
         
-        # Generate random office location and department
+        # Define user's office location and department
         $officeLocation = $officeLocations | Get-Random
         $department = $departments | Get-Random
-        
+
         # Create new user object
         $newUser = @{
             'DisplayName' = "$firstName $lastName"
             'GivenName' = $firstName
             'Surname' = $lastName
             'UserPrincipalName' = $username
-            'MailNickname' = $mail
+            'MailNickname' = $mailNickname
+            'AccountEnabled' = $true
+            'PasswordProfile' = @{
+                'Password' = $password
+                'ForceChangePasswordNextLogin' = $false
+                'EnforceChangePasswordPolicy' = $true
+            }
+            'OfficeLocation' = $officeLocation
+            'Department' = $department
+        }
+        
+        # Try to create user in Azure AD
+        try {
+            New-AzureADUser @newUser -ErrorAction Stop
+            Write-Host "User '$username' created successfully."
+        }
+        catch {
+            Write-Host "Error creating user '$username': $_"
+            }
+        }
+    # Disconnect from Azure AD
+    Disconnect-AzureAD
+}
