@@ -53,4 +53,6 @@ function Generate-AzureAD-Users
             Write-Host "Error creating user '$username': $_"
         }
     }
+    # Disconnect from Azure AD
+    Disconnect-AzureAD
 }
