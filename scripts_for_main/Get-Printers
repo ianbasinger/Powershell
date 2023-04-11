@@ -67,22 +67,23 @@ function Get-Printers
 
       # Prints out all of the information we need for each printer, seperated by a green line. Color coded to make it easier to read as well
       Write-Host "Printer Name: $name" -ForegroundColor Green
-      Write-Host "Location/IP: $location" -ForegroundColor Green
+      Write-Host "Printer Status: $printerStatus" -ForegroundColor Green
       Write-Host "Driver Name: $driverName" -ForegroundColor Green
+      Write-Host "Location/IP: $location" -ForegroundColor Green
       Write-Host "Port Name: $portName" -ForegroundColor Green
       Write-Host "Port Type: $portType" -ForegroundColor Green
       Write-Host "Port Description: $portDescription" -ForegroundColor Green
-      Write-Host "Printer Status: $printerStatus" -ForegroundColor Red
       Write-Host "Job Count: $jobCount" -ForegroundColor Cyan
       Write-Host "Job Status: $jobStatus" -ForegroundColor Cyan
-      Write-Host "Print Queue: $($printQueue | Format-Table | Out-String)"  -ForegroundColor Cyan
+      Write-Host "Print Queue:" -ForegroundColor Cyan
+      $printQueue | Format-Table -Wrap -AutoSize | Out-String
       Write-Host "Print Processor: $printProcessor" -ForegroundColor Yellow
       Write-Host "Server Name: $serverName" -ForegroundColor Yellow
       Write-Host "Shared: $shared" -ForegroundColor Yellow
       Write-Host "Share Name: $shareName" -ForegroundColor Yellow
+      Write-Host "Shared Name: $sharedName" -ForegroundColor Yellow
       Write-Host "Published: $published" -ForegroundColor Yellow
       Write-Host "Default: $default" -ForegroundColor Yellow
-      Write-Host "Shared Name: $sharedName" -ForegroundColor Yellow
       Write-Host "Duplex: $duplex" -ForegroundColor Yellow
       Write-Host "Printer Permissions: $printPermissions" -ForegroundColor Magenta
       Write-Host "Manage Printer Permissions: $managePermissions" -ForegroundColor Magenta
