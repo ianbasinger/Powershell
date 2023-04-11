@@ -13,18 +13,28 @@ function Get-Printers
       $driverName = $printer.DriverName
       $portName = $printer.PortName
       $location = $printer.Location
+      # Basic info to get drivers in use, ports, printer location
+
       $printProcessor = $printer.PrintProcessor
       $serverName = $printer.ServerName
       $shared = $printer.Shared
       $shareName = $printer.ShareName
+      $sharedName = $printer.SharedName
+      # Print shares
+
       $published = $printer.Published
       $default = $printer.Default
-      $sharedName = $printer.SharedName
       $duplex = $printer.Duplex
+      # Basic printer info, such as duplex, default printer, published
+
       $printPermissions = $printer.PrinterPermissions
       $managePermissions = $printer.ManagePrinterPermissions
       $controlPermissions = $printer.ManageDocumentsPermissions
-      # Get various printer diagnostics and info, assign to variables to use later
+      # Printer permissions
+
+      $wsdIP = Get-ChildItem -Path Registry::\HKLM\SYSTEM\CurrentControlSet\Enum\SWD\DAFWSDProvider -ErrorAction SilentlyContinue | Get-ItemProperty | Select-Object LocationInformation,Mfg,FriendlyName | Sort-Object -Property LocationInformation,Mfg,FriendlyName | Get-Unique -AsString
+      # This is going to be used outside of the foreach loop, instead we will call on this variable later on after the foreach loop to give us the associated IP addresses for any WSD ports in use, as WSD is really annoying
+      # The main reason this is used is any previous printers setup with WSD won't have an IP address we can find them from. This can make it troublesome to map a printer using WSD to an IP address. This instantly makes it quicker to check.
 
       $port = Get-WmiObject -Query "Select * From Win32_PrinterConfiguration WHERE Name = '$name'"
       # Port is a useful piece of info to know, for example to determine if something is using WSD or TCP/IP
@@ -79,4 +89,6 @@ function Get-Printers
       Write-Host "Manage Documents Permissions: $controlPermissions" -ForegroundColor Magenta
       Write-Host "-------------------------------------------------------------------------------------------------------------------------------------------" -ForegroundColor Green
   }
+  # This will keep looping and each printer will be seperated by the green line output. After all printers are done, we will display some WSD port information as well.
+  Write-Host "The following WSD ports are pesent, here are their associated IP addresses: $wsdIP" -ForegroundColor Gray
 }
